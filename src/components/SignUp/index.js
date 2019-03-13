@@ -29,6 +29,13 @@ class SignUpFormBase extends Component {
         email,
         passwordOne,
       );
+      const fireBaseUser = await this.props.firebase
+        .user(authUser.user.uid)
+        .set({
+          username,
+          email,
+        });
+
       this.setState({
         username: '',
         email: '',
