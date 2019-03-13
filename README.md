@@ -10,4 +10,4 @@ A boilerplate project for getting you started with [Firebase in React](https://w
 * `cd react-firebase-authentication-starter-kit`
 * `npm install`
 * `npm start`
-* visit http://localhost:3000/
+* visit http://localhost:3000/# React-Firebase-Starter
