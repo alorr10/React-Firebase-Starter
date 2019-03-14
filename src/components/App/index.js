@@ -28,7 +28,7 @@ const App = () => (
       />
       <Route path={ROUTES.HOME} component={HomePage} />
       <PrivateRoute path={ROUTES.ACCOUNT} component={AccountPage} />
-      <PrivateRoute path={ROUTES.ADMIN} component={AdminPage} />
+      <Route path={ROUTES.ADMIN} component={AdminPage} />
     </div>
   </Router>
 );

@@ -2,7 +2,18 @@ import React, { Component } from 'react';
 import { compose } from 'recompose';
 import { Link, withRouter } from 'react-router-dom';
 import { withFirebase } from '../Firebase';
+import * as ROLES from '../../constants/roles';
 import * as ROUTES from '../../constants/routes';
+
+const ERROR_CODE_ACCOUNT_EXISTS =
+  'auth/account-exists-with-different-credential';
+const ERROR_MSG_ACCOUNT_EXISTS = `
+  An account with an E-Mail address to
+  this social account already exists. Try to login from
+  this account instead and associate your social accounts on
+  your personal account page.
+`;
+
 const SignUpPage = () => (
   <div>
     <h1>SignUp</h1>
@@ -18,12 +29,15 @@ class SignUpFormBase extends Component {
       email: '',
       passwordOne: '',
       passwordTwo: '',
+      isAdmin: false,
       error: null,
     };
   }
   onSubmit = async event => {
     event.preventDefault();
-    const { username, email, passwordOne } = this.state;
+    const { username, email, passwordOne, isAdmin } = this.state;
+    const roles = [];
+    if (isAdmin) roles.push(ROLES.ADMIN);
     try {
       const authUser = await this.props.firebase.doCreateUserWithEmailAndPassword(
         email,
@@ -34,6 +48,7 @@ class SignUpFormBase extends Component {
         .set({
           username,
           email,
+          roles,
         });
 
       this.setState({
@@ -45,12 +60,21 @@ class SignUpFormBase extends Component {
       });
       this.props.history.push(ROUTES.HOME);
     } catch (error) {
+      if (error.code === ERROR_CODE_ACCOUNT_EXISTS) {
+        error.message = ERROR_MSG_ACCOUNT_EXISTS;
+      }
       this.setState({ error });
     }
   };
+
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
+
+  onChangeCheckbox = event => {
+    this.setState({ [event.target.name]: event.target.checked });
+  };
+
   render() {
     const {
       username,
@@ -58,6 +82,7 @@ class SignUpFormBase extends Component {
       passwordOne,
       passwordTwo,
       error,
+      isAdmin,
     } = this.state;
 
     const isInvalid =
@@ -96,6 +121,15 @@ class SignUpFormBase extends Component {
           type="password"
           placeholder="Confirm Password"
         />
+        <label>
+          Admin:
+          <input
+            name="isAdmin"
+            type="checkbox"
+            checked={isAdmin}
+            onChange={this.onChangeCheckbox}
+          />
+        </label>
         <button disabled={isInvalid} type="submit">
           Sign Up
         </button>
